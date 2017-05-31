@@ -120,10 +120,6 @@ var enemyMovementY = function(obj) {
   return obj.y;
 };
 
-var enemyRenderMove = function() {
-  var enemies = d3.selectAll('.enemy');
-  enemies.transition().duration(2000).on('end', moveEachEnemy);
-};
 var moveEachEnemy = function() {
   return d3.selectAll('.enemy').each(function() {
     d3.select(this).transition().duration(2000).attr('cx', axes.x(Math.random() * 100))
