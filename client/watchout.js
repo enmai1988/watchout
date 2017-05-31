@@ -3,12 +3,12 @@
 var gameOptions = {
   width: 700,
   height: 450,
-  numEnemies: 30, 
+  numEnemies: 5, 
   padding: 20
 };
 
 var gameStats = {
-  currentScore: 100,
+  currentScore: 0,
   highScore: 0
 };
 
@@ -25,7 +25,8 @@ var updateScore = function() {
 
 var updateBestScore = function() {
   gameStats.highScore = Math.max(gameStats.currentScore, gameStats.highScore);
-  return d3.select('.highscore span').text(gameStats.highscore);
+  gameStats.currentScore = 0;
+  return d3.select('.highscore span').text(gameStats.highScore);
 };
 
 class Player {
@@ -105,8 +106,69 @@ var enemyRender = function(enemyData) {
                                         .attr('r', 5);
 };
 
-var enemies = generateEnemies();
-enemyRender(enemies);
+
+var enemies = generateEnemies(); // enemy array
+enemyRender(enemies); 
+
+var enemyMovementX = function(obj) {
+  obj.x = axes.x(Math.random() * 100);
+  return obj.x;
+};
+
+var enemyMovementY = function(obj) {
+  obj.y = axes.y(Math.random() * 100);
+  return obj.y;
+};
+
+var enemyRenderMove = function() {
+  var enemies = d3.selectAll('.enemy');
+  enemies.transition().duration(2000).on('end', moveEachEnemy);
+  // return d3.selectAll('.enemy')
+  //          .attr('cx', d => enemyMovementX(d))
+  //          .attr('cy', d => enemyMovementY(d));
+           // .each(function(d) {
+           //   checkCollision(d);
+           // });
+};
+var moveEachEnemy = function() {
+  return d3.selectAll('.enemy').each(function() {
+    d3.select(this).transition().duration(2000).attr('cx', axes.x(Math.random() * 100))
+                                               .attr('cy', axes.y(Math.random() * 100)).on('end', moveEachEnemy);
+  });
+};
+
+moveEachEnemy();
+// var callRenderMove = function() {
+//   return d3.selectAll('.enemy').transition().on('end', enemyRenderMove).duration(2000);
+// };
+
+var checkCollision = function(enemy) {
+  var radiusSum = player.r + Number(d3.select('.enemy').attr('r'));
+  // console.log(radiusSum);
+  // var xDiff = player.x - Number(enemy.attr('cx'));
+  var xDiff = d3.scaleLinear().domain([0, 100]).range([0, gameOptions.width]).invert(player.x - enemy.x);
+  // var yDiff = player.y - Number(enemy.attr('cy'));
+  console.log(enemy);
+  var yDiff = d3.scaleLinear().domain([0, 100]).range([0, gameOptions.height]).invert(player.y - enemy.y);
+  var hypotenuse = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
+  // console.log(hypotenuse);
+  if (hypotenuse > radiusSum) {
+    return false;
+  } else {
+    // console.log(hypotenuse);
+    updateBestScore();
+    return true;
+  } 
+};
+
+// d3.timer(checkCollision);
+
+var scoreCounter = function() {
+  gameStats.currentScore++;
+  updateScore();
+};
+
+setInterval(scoreCounter, 150);
 
 
 
