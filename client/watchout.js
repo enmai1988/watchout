@@ -89,14 +89,12 @@ class Player {
 
 var player = new Player();
 
-var generateEnemies = function() {
-  return _.range(0, gameOptions.numEnemies).map(function(val) {
-    var obj = {};
-    obj.x = Math.random() * 100;
-    obj.y = Math.random() * 100;
-    return obj;
-  });
-};
+var enemyArray = _.range(0, gameOptions.numEnemies).map(function(val) {
+  var obj = {};
+  obj.x = Math.random() * 100;
+  obj.y = Math.random() * 100;
+  return obj;
+});
 
 var enemyRender = function(enemyData) {
   var selection = gameBoard.selectAll('enemy').data(enemyData);
@@ -106,19 +104,7 @@ var enemyRender = function(enemyData) {
                                         .attr('r', 5);
 };
 
-
-var enemies = generateEnemies(); // enemy array
-enemyRender(enemies);
-
-var enemyMovementX = function(obj) {
-  obj.x = axes.x(Math.random() * 100);
-  return obj.x;
-};
-
-var enemyMovementY = function(obj) {
-  obj.y = axes.y(Math.random() * 100);
-  return obj.y;
-};
+enemyRender(enemyArray);
 
 var moveEachEnemy = function() {
   return d3.selectAll('.enemy').each(function() {
